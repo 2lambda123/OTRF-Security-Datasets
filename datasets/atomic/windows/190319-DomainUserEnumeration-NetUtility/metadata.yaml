@@ -1,0 +1,64 @@
+id: 190319-DomainUserEnumeration-NetUtility
+title: Domain Users Enumeration via Net Utility
+description: This dataset represents adversaries enumerating all users that belong to a domain via the Net utility.
+references:
+  - https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/network-access-restrict-clients-allowed-to-make-remote-sam-calls#audit-only-mode
+  - https://github.com/OTRF/Blacksmith/blob/master/resources/scripts/powershell/auditing/Set-AuditSAMRemoteCalls.ps1
+
+collaborators:
+  - Roberto Rodriguez @Cyb3rWard0g
+creation_date: 2019/03/19
+modification_date: 2022/09/21
+platform:
+  - Windows
+type: atomic
+tags:
+  - Domain Users Enumeration
+  - RPC SAMR EnumDomainUsers
+
+attack_mappings:
+  - technique: T1087
+    sub-technique: "002"
+    tactics:
+      - TA0007
+
+datasets:
+  endpoint:
+    - log_source: Microsoft-Windows-Sysmon
+      size: 18.58 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190319-DomainUserEnumeration-NetUtility/DC01_Windows_MicrosoftWindowsSysmonOperational.zip
+    - log_source: Microsoft-Windows-Security-Auditing
+      size: 39.92 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190319-DomainUserEnumeration-NetUtility/DC01_Windows_Security.zip
+    - log_source: Microsoft-Windows-Directory-Services-SAM
+      size: 8.22 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190319-DomainUserEnumeration-NetUtility/DC01_Windows_System.zip
+    - log_source: Microsoft-Windows-Sysmon
+      size: 223.85 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190319-DomainUserEnumeration-NetUtility/WORKSTATION6_Windows_MicrosoftWindowsSysmonOperational.zip
+    - log_source: Microsoft-Windows-Security-Auditing
+      size: 32.85 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190319-DomainUserEnumeration-NetUtility/WORKSTATION6_Windows_Security.zip
+  network:
+    - log_source: Wireshark
+      size: 73.91 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190319-DomainUserEnumeration-NetUtility/DC01_Windows_PCAP.zip
+
+simulation:
+  executor: CMD
+  scriptUri:
+  supportingFileUris:
+  commands: |-
+    net user /domain
+  output: |-
+    The request will be processed at a domain controller for domain mssentinel.local.
+
+    User accounts for \\DC01.mssentinel.local
+    -------------------------------------------------------------------------------
+    adfsadmin                Guest                    krbtgt
+    lrodriguez               nmartha                  nxlogsvc
+    pgustavo                 sbeavers                 sysmonsvc
+    wardog
+    The command completed successfully.
+
+detection:

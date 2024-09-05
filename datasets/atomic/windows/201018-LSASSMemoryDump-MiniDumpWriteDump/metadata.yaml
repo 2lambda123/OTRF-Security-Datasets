@@ -1,0 +1,44 @@
+id: 201018-LSASSMemoryDump-MiniDumpWriteDump
+title: Lsass Memory Dump via MiniDumpWriteDump API
+description: This dataset represents adversaries using using the MiniDumpWriteDump Win32 API to dump the memory contents of lsass.
+references:
+  - https://learn.microsoft.com/en-us/windows/win32/api/minidumpapiset/nf-minidumpapiset-minidumpwritedump
+  - https://github.com/outflanknl/Dumpert
+
+collaborators:
+  - Roberto Rodriguez @Cyb3rWard0g
+creation_date: 2020/10/18
+modification_date: 2022/09/21
+platform:
+  - Windows
+type: atomic
+tags:
+  - Win32 API
+  - LSASS Memory Dump
+
+attack_mappings:
+  - technique: T1003
+    sub-technique: "001"
+    tactics:
+      - TA0006
+
+datasets:
+  endpoint:
+    - log_source: Microsoft-Windows-Sysmon
+      size: 82.19 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/201018-LSASSMemoryDump-MiniDumpWriteDump/WORKSTATION6_Windows_MicrosoftWindowsSysmonOperational.zip
+    - log_source: Microsoft-Windows-Security-Auditing
+      size: 41.04 kB
+      link: https://raw.githubusercontent.com/OTRF/Security-Datasets/SecurityDatasets2.0/datasets/atomic/windows/201018-LSASSMemoryDump-MiniDumpWriteDump/WORKSTATION6_Windows_Security.zip
+
+simulation:
+  executor: CMD
+  scriptUri:
+  supportingFileUris:
+  commands: |-
+    MiniDump.exe
+  output: |-
+    Found lsass PID: 764
+    [+] Memory Dumped
+
+detection:
